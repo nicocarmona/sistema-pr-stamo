@@ -226,7 +226,9 @@
             listaUsuarios.forEach(function([dni, u]) {
                 const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
                 const totalPagado = pagosCompletados * u.valorCuota;
-                const saldoPendiente = (u.cuotas - pagosCompletados.length) * u.valorCuota;
+               const valorCuota = u.valorCuota || 0;
+                const cuotas = u.cuotas || 0;
+                const saldoPendiente = (cuotas - pagosCompletados.length) * valorCuota;
                 const alDia = saldoPendiente === 0;
 
                 const fila = document.createElement('tr');
@@ -243,22 +245,27 @@
         }
 
         function cargarResumen() {
-            let totalPrestado = 0, totalCobrado = 0, porCobrar = 0, conDeuda = 0;
+    let totalPrestado = 0, totalCobrado = 0, porCobrar = 0, conDeuda = 0;
 
-            Object.values(usuarios).forEach(function(u) {
-                totalPrestado = totalPrestado + u.montoTotal;
-                const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
-                totalCobrado = totalCobrado + (pagosCompletados * u.valorCuota);
-                const saldoPendiente = (u.cuotas - pagosCompletados.length) * u.valorCuota;
-                porCobrar = porCobrar + saldoPendiente;
-                if (saldoPendiente > 0) conDeuda++;
-            });
+    Object.values(usuarios).forEach(function(u) {
+        totalPrestado = totalPrestado + u.montoTotal;
+        const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
+        const valorCuota = u.valorCuota || 0;
+        const cuotas = u.cuotas || 0;
+        const totalPagado = pagosCompletados * valorCuota;
+        const saldoPendiente = (cuotas - pagosCompletados) * valorCuota;
+        
+        totalCobrado = totalCobrado + totalPagado;
+        porCobrar = porCobrar + saldoPendiente;
+        
+        if (saldoPendiente > 0) conDeuda++;
+    });
 
-            document.getElementById('total-prestado').textContent = '$' + totalPrestado.toLocaleString();
-            document.getElementById('total-cobrado').textContent = '$' + totalCobrado.toLocaleString();
-            document.getElementById('por-cobrar').textContent = '$' + porCobrar.toLocaleString();
-            document.getElementById('con-deuda').textContent = conDeuda;
-        }
+    document.getElementById('total-prestado').textContent = '$' + totalPrestado.toLocaleString();
+    document.getElementById('total-cobrado').textContent = '$' + totalCobrado.toLocaleString();
+    document.getElementById('por-cobrar').textContent = '$' + porCobrar.toLocaleString();
+    document.getElementById('con-deuda').textContent = conDeuda;
+}
     </script>
 </body>
 </html>
