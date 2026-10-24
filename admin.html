@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body {
+            background: #000000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #111111;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #d4af37;
+        }
+        h1 {
+            color: #d4af37;
+            font-size: 22px;
+        }
+        .cerrar {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .cerrar:hover { background: #dc2626; }
+        .card {
+            background: #111111;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #d4af37;
+        }
+        h2 {
+            font-size: 18px;
+            color: #d4af37;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+        .buscar {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            background: #0d0d0d;
+            color: #f5f5f5;
+        }
+        .buscar:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background: #0d0d0d;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        td { color: #e0e0e0; }
+        .estado-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            display: inline-block;
+        }
+        .al-dia {
+            background: #0f2e0f;
+            color: #4ade80;
+            border: 1px solid #22c55e;
+        }
+        .con-deuda {
+            background: #2e0f0f;
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+        .resumen {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .resumen-card {
+            background: #0d0d0d;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .resumen-titulo {
+            font-size: 14px;
+            color: #b8b8b8;
+            margin-bottom: 8px;
+        }
+        .resumen-valor {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f5f5f5;
+        }
+        .verde { color: #4ade80; }
+        .rojo { color: #f87171; }
+        .fila-usuario:hover { background: #1a1a1a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧑‍💼 Panel del Administrador</h1>
+            <!-- 🔗 CONEXIÓN: vuelve al inicio -->
+            <button class="cerrar" onclick="window.location.href='index.html'">Salir</button>
+        </div>
+
+        <div class="card">
+            <h2>📈 Resumen General</h2>
+            <div class="resumen">
+                <div class="resumen-card">
+                    <div class="resumen-titulo">Total Prestado</div>
+                    <div class="resumen-valor" id="total-prestado">$0</div>
+                </div>
+                <div class="resumen-card">
+                    <div class="resumen-titulo">Total Cobrado</div>
+                    <div class="resumen-valor verde" id="total-cobrado">$0</div>
+                </div>
+                <div class="resumen-card">
+                    <div class="resumen-titulo">Por Cobrar</div>
+                    <div class="resumen-valor rojo" id="por-cobrar">$0</div>
+                </div>
+                <div class="resumen-card">
+                    <div class="resumen-titulo">Con Deuda</div>
+                    <div class="resumen-valor rojo" id="con-deuda">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>👥 Lista de Clientes</h2>
+            <input type="text" class="buscar" id="buscar" placeholder="🔍 Buscar por nombre o DNI...">
+            <table>
+                <thead>
+                    <tr>
+                        <th>DNI</th>
+                        <th>Nombre</th>
+                        <th>Préstamo</th>
+                        <th>Pagado</th>
+                        <th>Debe</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-usuarios"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Misma base de datos
+        const usuarios = {
+            "12345678": {
+                nombre: "Juan Pérez",
+                montoTotal: 50000,
+                cuotas: 5,
+                valorCuota: 11000,
+                pagos: [
+                    { cuota: 1, fecha: "10/09/2026", monto: 11000, estado: "pagado" },
+                    { cuota: 2, fecha: "10/10/2026", monto: 11000, estado: "pagado" },
+                    { cuota: 3, fecha: "10/11/2026", monto: 11000, estado: "pendiente" },
+                    { cuota: 4, fecha: "10/12/2026", monto: 11000, estado: "pendiente" },
+                    { cuota: 5, fecha: "10/01/2027", monto: 11000, estado: "pendiente" }
+                ]
+            },
+            "87654321": {
+                nombre: "María López",
+                montoTotal: 20000,
+                cuotas: 4,
+                valorCuota: 5500,
+                pagos: [
+                    { cuota: 1, fecha: "01/09/2026", monto: 5500, estado: "pagado" },
+                    { cuota: 2, fecha: "01/10/2026", monto: 5500, estado: "pagado" },
+                    { cuota: 3, fecha: "01/11/2026", monto: 5500, estado: "pagado" },
+                    { cuota: 4, fecha: "01/12/2026", monto: 5500, estado: "pagado" }
+                ]
+            }
+        };
+
+        let listaUsuarios = Object.entries(usuarios);
+        cargarTabla();
+        cargarResumen();
+
+        document.getElementById('buscar').addEventListener('input', function(e) {
+            const texto = e.target.value.toLowerCase();
+            const filtrados = Object.entries(usuarios).filter(function([dni, u]) {
+                return dni.includes(texto) || u.nombre.toLowerCase().includes(texto);
+            });
+            listaUsuarios = filtrados;
+            cargarTabla();
+        });
+
+        function cargarTabla() {
+            const tbody = document.getElementById('tabla-usuarios');
+            tbody.innerHTML = '';
+            listaUsuarios.forEach(function([dni, u]) {
+                const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
+                const totalPagado = pagosCompletados * u.valorCuota;
+                const saldoPendiente = (u.cuotas - pagosCompletados.length) * u.valorCuota;
+                const alDia = saldoPendiente === 0;
+
+                const fila = document.createElement('tr');
+                fila.className = 'fila-usuario';
+                fila.innerHTML =
+                    '<td><strong>' + dni + '</strong></td>' +
+                    '<td>' + u.nombre + '</td>' +
+                    '<td>$' + u.montoTotal.toLocaleString() + '</td>' +
+                    '<td style="color: #4ade80; font-weight: bold">$' + totalPagado.toLocaleString() + '</td>' +
+                    '<td style="color: ' + (alDia ? '#e0e0e0' : '#f87171') + '; font-weight: bold">$' + saldoPendiente.toLocaleString() + '</td>' +
+                    '<td><span class="estado-badge ' + (alDia ? 'al-dia' : 'con-deuda') + '">' + (alDia ? '✅ Al día' : '⚠️ Con deuda') + '</span></td>';
+                tbody.appendChild(fila);
+            });
+        }
+
+        function cargarResumen() {
+            let totalPrestado = 0, totalCobrado = 0, porCobrar = 0, conDeuda = 0;
+
+            Object.values(usuarios).forEach(function(u) {
+                totalPrestado = totalPrestado + u.montoTotal;
+                const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
+                totalCobrado = totalCobrado + (pagosCompletados * u.valorCuota);
+                const saldoPendiente = (u.cuotas - pagosCompletados.length) * u.valorCuota;
+                porCobrar = porCobrar + saldoPendiente;
+                if (saldoPendiente > 0) conDeuda++;
+            });
+
+            document.getElementById('total-prestado').textContent = '$' + totalPrestado.toLocaleString();
+            document.getElementById('total-cobrado').textContent = '$' + totalCobrado.toLocaleString();
+            document.getElementById('por-cobrar').textContent = '$' + porCobrar.toLocaleString();
+            document.getElementById('con-deuda').textContent = conDeuda;
+        }
+    </script>
+</body>
+</html>

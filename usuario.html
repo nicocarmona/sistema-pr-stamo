@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta — Cliente</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body {
+            background: #000000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #111111;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #d4af37;
+        }
+        h1 {
+            color: #d4af37;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .dni {
+            color: #b8b8b8;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            display: inline-block;
+        }
+        .al-dia {
+            background: #0f2e0f;
+            color: #4ade80;
+            border: 2px solid #22c55e;
+        }
+        .con-deuda {
+            background: #2e0f0f;
+            color: #f87171;
+            border: 2px solid #ef4444;
+        }
+        .card {
+            background: #111111;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #d4af37;
+        }
+        h2 {
+            font-size: 18px;
+            color: #d4af37;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #333;
+        }
+        .dato {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+            font-size: 15px;
+        }
+        .etiqueta { color: #b8b8b8; }
+        .valor { color: #f5f5f5; font-weight: bold; }
+        .historial {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .historial th, .historial td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        .historial th {
+            background: #0d0d0d;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        .historial td { color: #e0e0e0; }
+        .pagado { color: #4ade80; font-weight: bold; }
+        .pendiente { color: #f87171; font-weight: bold; }
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .volver:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="nombre-usuario">Bienvenido/a</h1>
+            <p class="dni">DNI: <span id="mi-dni"></span></p>
+            <div id="estado" class="status"></div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Resumen de tu Préstamo</h2>
+            <div class="dato">
+                <span class="etiqueta">Monto prestado:</span>
+                <span class="valor" id="monto-total">$0</span>
+            </div>
+            <div class="dato">
+                <span class="etiqueta">Total que pagaste:</span>
+                <span class="valor" id="total-pagado">$0</span>
+            </div>
+            <div class="dato">
+                <span class="etiqueta">Saldo pendiente:</span>
+                <span class="valor" id="saldo-pendiente">$0</span>
+            </div>
+            <div class="dato">
+                <span class="etiqueta">Cuotas pagadas:</span>
+                <span class="valor" id="cuotas-pagadas">0 / 0</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📅 Historial de Pagos</h2>
+            <table class="historial">
+                <thead>
+                    <tr>
+                        <th>Cuota</th>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-pagos"></tbody>
+            </table>
+        </div>
+
+        <!-- 🔗 CONEXIÓN: vuelve a index.html -->
+        <a href="index.html" class="volver">← Cerrar sesión</a>
+    </div>
+
+    <script>
+        // Base de datos de usuarios de prueba
+        const usuarios = {
+            "12345678": {
+                nombre: "Juan Pérez",
+                montoTotal: 50000,
+                cuotas: 5,
+                valorCuota: 11000,
+                pagos: [
+                    { cuota: 1, fecha: "10/09/2026", monto: 11000, estado: "pagado" },
+                    { cuota: 2, fecha: "10/10/2026", monto: 11000, estado: "pagado" },
+                    { cuota: 3, fecha: "10/11/2026", monto: 11000, estado: "pendiente" },
+                    { cuota: 4, fecha: "10/12/2026", monto: 11000, estado: "pendiente" },
+                    { cuota: 5, fecha: "10/01/2027", monto: 11000, estado: "pendiente" }
+                ]
+            },
+            "87654321": {
+                nombre: "María López",
+                montoTotal: 20000,
+                cuotas: 4,
+                valorCuota: 5500,
+                pagos: [
+                    { cuota: 1, fecha: "01/09/2026", monto: 5500, estado: "pagado" },
+                    { cuota: 2, fecha: "01/10/2026", monto: 5500, estado: "pagado" },
+                    { cuota: 3, fecha: "01/11/2026", monto: 5500, estado: "pagado" },
+                    { cuota: 4, fecha: "01/12/2026", monto: 5500, estado: "pagado" }
+                ]
+            }
+        };
+
+        // Leer el DNI que vino de index.html
+        let dni = window.location.search;
+console.log('Datos recibidos:', dni); // Para ver en consola
+
+if (dni.indexOf('dni=') === -1) {
+    alert('No se recibió ningún DNI. Volviendo al inicio.');
+    window.location.href = 'index.html';
+} else {
+    dni = dni.split('dni=')[1];
+    dni = dni.split('&')[0]; // Por si hay más datos después
+    dni = decodeURIComponent(dni);
+    document.getElementById('mi-dni').textContent = dni;
+    
+    const usuario = usuarios[dni];
+    if (!usuario) {
+        alert('No existe un usuario con DNI: ' + dni);
+        window.location.href = 'index.html';
+    } else {
+        cargarDatos(usuario);
+    }
+}
+
+        // Verificar si el usuario existe
+        const usuario = usuarios[dni];
+        if (!usuario) {
+            alert('Usuario no encontrado. Volviendo al inicio.');
+            // 🔗 CONEXIÓN: si no existe, vuelve al inicio
+            window.location.href = 'index.html';
+        } else {
+            cargarDatos(usuario);
+        }
+
+        function cargarDatos(u) {
+            document.getElementById('nombre-usuario').textContent = 'Hola, ' + u.nombre;
+            document.getElementById('monto-total').textContent = '$' + u.montoTotal.toLocaleString();
+
+            const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
+            const totalPagado = pagosCompletados * u.valorCuota;
+            const saldoPendiente = (u.cuotas - pagosCompletados) * u.valorCuota;
+
+            document.getElementById('total-pagado').textContent = '$' + totalPagado.toLocaleString();
+            document.getElementById('saldo-pendiente').textContent = '$' + saldoPendiente.toLocaleString();
+            document.getElementById('cuotas-pagadas').textContent = pagosCompletados.length + ' / ' + u.cuotas;
+
+            const estadoDiv = document.getElementById('estado');
+            if (saldoPendiente === 0) {
+                estadoDiv.textContent = '✅ Todo al día — ¡Felicitaciones!';
+                estadoDiv.className = 'status al-dia';
+            } else {
+                estadoDiv.textContent = '⚠️ Tenés deuda: $' + saldoPendiente.toLocaleString();
+                estadoDiv.className = 'status con-deuda';
+            }
+
+            const tbody = document.getElementById('tabla-pagos');
+            tbody.innerHTML = '';
+            u.pagos.forEach(function(p) {
+                const fila = document.createElement('tr');
+                const claseEstado = p.estado === 'pagado' ? 'pagado' : 'pendiente';
+                const textoEstado = p.estado === 'pagado' ? '✅ Pagado' : '⏳ Pendiente';
+                fila.innerHTML = '<td>' + p.cuota + '</td><td>' + p.fecha + '</td><td>$' + p.monto.toLocaleString() + '</td><td class="' + claseEstado + '">' + textoEstado + '</td>';
+                tbody.appendChild(fila);
+            });
+        }
+    </script>
+</body>
+</html>

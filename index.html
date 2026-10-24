@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Préstamos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #111111 0%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-section h1 {
+            color: #d4af37;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .logo-section p {
+            color: #b8b8b8;
+            font-size: 14px;
+        }
+        .card {
+            background: #1a1a1a;
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+            border: 1px solid #d4af37;
+        }
+        .card h2 {
+            color: #d4af37;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #0d0d0d;
+            color: #f5f5f5;
+        }
+        input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #e6c94f 0%, #d4af37 100%);
+        }
+        .admin-btn {
+            background: linear-gradient(135deg, #333 0%, #111 100%);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+        }
+        .admin-btn:hover {
+            background: #222;
+        }
+        .divider-line {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .divider-line hr {
+            flex: 1;
+            border: none;
+            border-top: 1px solid #333;
+        }
+        .divider-line span {
+            padding: 0 15px;
+            color: #666;
+            font-size: 13px;
+        }
+        .nota {
+            margin-top: 15px;
+            padding: 12px;
+            background: #0d0d0d;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #999;
+            line-height: 1.6;
+            border: 1px solid #333;
+        }
+        .nota strong {
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="logo-section">
+            <h1>💰 Sistema de Préstamos</h1>
+            <p>Acceso seguro y confiable</p>
+        </div>
+
+        <!-- 👤 SECCIÓN CLIENTE -->
+        <div class="card">
+            <h2>👤 Acceso de Cliente</h2>
+            <p style="color:#b8b8b8; font-size:13px; margin-bottom:10px;">Ingresá con tu número de DNI para ver tu cuenta</p>
+            <input type="text" id="dni" placeholder="Escribí tu DNI (solo números)" maxlength="8">
+            <button onclick="iniciarSesion()">Ingresar a mi cuenta</button>
+        </div>
+
+        <!-- SEPARADOR -->
+        <div class="divider-line">
+            <hr>
+            <span>o</span>
+            <hr>
+        </div>
+
+        <!-- 🧑‍💼 SECCIÓN ADMINISTRADOR -->
+        <div class="card">
+            <h2>🧑‍💼 Acceso de Administrador</h2>
+            <p style="color:#b8b8b8; font-size:13px; margin-bottom:10px;">Solo para el prestamista — Panel de control</p>
+            <input type="password" id="admin-pass" placeholder="Escribí la contraseña de administrador">
+            <button class="admin-btn" onclick="ingresarAdmin()">Entrar al Panel de Control</button>
+        </div>
+
+        <div class="nota">
+            <strong>📌 Datos de prueba:</strong><br>
+            • Cliente: DNI <b>12345678</b><br>
+            • Administrador: Contraseña <b>admin1234</b>
+        </div>
+    </div>
+
+    <script>
+        function iniciarSesion() {
+            const dni = document.getElementById('dni').value.trim();
+            if (!dni) { 
+                alert('Por favor escribí tu número de DNI'); 
+                return; 
+            }
+            window.location.href = 'usuario.html?dni=' + dni;
+        }
+        function ingresarAdmin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'admin1234') {
+                window.location.href = 'admin.html';
+            } else {
+                alert('Contraseña incorrecta. Inténtalo nuevamente.');
+            }
+        }
+    </script>
+</body>
+</html>
