@@ -111,23 +111,25 @@
 
         <div class="card">
             <h2>📊 Resumen de tu Préstamo</h2>
-            <div class="dato">
-                <span class="etiqueta">Monto prestado:</span>
-                <span class="valor" id="monto-total">$0</span>
-            </div>
-            <div class="dato">
-                <span class="etiqueta">Total que pagaste:</span>
-                <span class="valor" id="total-pagado">$0</span>
-            </div>
-            <div class="dato">
-                <span class="etiqueta">Saldo pendiente:</span>
-                <span class="valor" id="saldo-pendiente">$0</span>
-            </div>
-            <div class="dato">
-                <span class="etiqueta">Cuotas pagadas:</span>
-                <span class="valor" id="cuotas-pagadas">0 / 0</span>
-            </div>
-        </div>
+           <div class="dato">
+  <span class="etiqueta">Monto prestado:</span>
+  <span class="valor" id="monto-total">$50.000</span>
+</div>
+
+<div class="dato">
+  <span class="etiqueta">Total que pagaste:</span>
+  <span class="valor" id="total-pagado">$22.000</span>
+</div>
+
+<div class="dato">
+  <span class="etiqueta">Saldo pendiente:</span>
+  <span class="valor" id="saldo-pendiente">$33.000</span>
+</div>
+
+<div class="dato">
+  <span class="etiqueta">Cuotas pagadas:</span>
+  <span class="valor" id="cuotas-pagas">2 / 5</span>
+</div>
 
         <div class="card">
             <h2>📅 Historial de Pagos</h2>
@@ -141,6 +143,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-pagos"></tbody>
+            
             </table>
         </div>
 
@@ -216,11 +219,11 @@ if (dni.indexOf('dni=') === -1) {
 
             const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
             const totalPagado = pagosCompletados * u.valorCuota;
-            const saldoPendiente = (u.cuotas - pagosCompletados) * u.valorCuota;
+            const saldoPendiente = (u.cuotas * pagosCompletados) - (pagosCompletados * u.valorCuota);
 
             document.getElementById('total-pagado').textContent = '$' + totalPagado.toLocaleString();
             document.getElementById('saldo-pendiente').textContent = '$' + saldoPendiente.toLocaleString();
-            document.getElementById('cuotas-pagas').textContext = '2 / 5';
+            document.getElementById('cuotas-pagas').textContext = pagosCompletados.length + ' / ' + u.pagos.length;
 
             const estadoDiv = document.getElementById('estado');
             if (saldoPendiente === 0) {
@@ -229,18 +232,18 @@ if (dni.indexOf('dni=') === -1) {
             } else {
                 estadoDiv.textContent = '⚠️ Tenés deuda: $' + saldoPendiente.toLocaleString();
                 estadoDiv.className = 'status con-deuda';
-            }
 
-            const tbody = document.getElementById('tabla-pagos');
-            tbody.innerHTML = '';
-            u.pagos.forEach(function(p) {
-                const fila = document.createElement('tr');
-                const claseEstado = p.estado === 'pagado' ? 'pagado' : 'pendiente';
-                const textoEstado = p.estado === 'pagado' ? '✅ Pagado' : '⏳ Pendiente';
-                fila.innerHTML = '<td>' + p.cuota + '</td><td>' + p.fecha + '</td><td>$' + p.monto.toLocaleString() + '</td><td class="' + claseEstado + '">' + textoEstado + '</td>';
-                tbody.appendChild(fila);
-            });
+                const tbody = document.getElementById('tabla-pagos');
+tbody.innerHTML = '';
+u.pagos.forEach(function(p) {
+  const fila = document.createElement('tr');
+  const textoEstado = p.estado === 'pagado' ? '✅ Pagado' : '⏳ Pendiente';
+  fila.innerHTML = '<td>' + p.cuota + '</td><td>' + p.fecha + '</td><td>$' + p.monto.toLocaleString() + '</td><td>' + textoEstado + '</td>';
+  tbody.appendChild(fila);
+});
+            }
         }
+        
     </script>
 </body>
 </html>
