@@ -220,7 +220,7 @@ if (dni.indexOf('dni=') === -1) {
 
             document.getElementById('total-pagado').textContent = '$' + totalPagado.toLocaleString();
             document.getElementById('saldo-pendiente').textContent = '$' + saldoPendiente.toLocaleString();
-            document.getElementById('cuotas-pagadas').textContent = pagosCompletados.length + ' / ' + u.cuotas;
+            document.getElementById('cuotas-pagadas').textContent = pagosCompletados.length + 2 / 5 + u.cuotas;
 
             const estadoDiv = document.getElementById('estado');
             if (saldoPendiente === 0) {
