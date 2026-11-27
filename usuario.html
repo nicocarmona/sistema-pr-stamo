@@ -219,7 +219,7 @@ if (dni.indexOf('dni=') === -1) {
 
             const pagosCompletados = u.pagos.filter(function(p) { return p.estado === 'pagado'; }).length;
             const totalPagado = pagosCompletados * u.valorCuota;
-            const saldoPendiente = (u.cuotas * pagosCompletados) - (pagosCompletados * u.valorCuota);
+            const saldoPendiente = u.montoTotal - totalPagado;
 
             document.getElementById('total-pagado').textContent = '$' + totalPagado.toLocaleString();
             document.getElementById('saldo-pendiente').textContent = '$' + saldoPendiente.toLocaleString();
